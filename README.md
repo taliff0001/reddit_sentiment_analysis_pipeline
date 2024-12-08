@@ -61,6 +61,8 @@ reddit_streaming_pipeline/
 1. Clone this repository:
     ```bash
     git clone https://github.com/your-username/reddit-sentiment-pipeline.git
+    ```
+    ```bash
     cd reddit-sentiment-pipeline
     ```
 
