@@ -8,36 +8,53 @@ import pandas as pd
 
 # Configuration
 CONFIG = {
-    "subreddits": ["worldnews", "news"],
-    "keywords": ["climate", "politics"],
-    "db_table": "general_sentiment"
+    "subreddits": ["worldnews", "politics"],
+    "keywords": ["climate"],
+    # "db_table": "general_sentiment"
 }
 
 def main():
     # Step 1: Authenticate Reddit API
     reddit = authenticate_reddit()
+    # threads = fetch_threads(reddit, "worldnews", limit=5)
+    # print(threads)
+
+    # Convert threads to a DataFrame
+    # threads_df = pd.DataFrame(threads)
+
+    # Print the DataFrame
+    # print("Threads DataFrame:")
+    # print(threads_df.head())
 
     # Step 2: Collect threads
     threads = []
     for subreddit in CONFIG["subreddits"]:
-        threads += fetch_threads(reddit, subreddit, keywords=CONFIG["keywords"], limit=50)
+        threads += fetch_threads(reddit, subreddit, keywords=None, limit=5)
 
+    if not threads:
+        print("No threads were fetched. Check subreddit names, keywords, or API limits.")
+        return
+    print(threads)
     # Step 3: Convert to DataFrame
     threads_df = pd.DataFrame(threads)
+    print("Threads DataFrame:")
+    print(threads_df.head())
 
     # Step 4: Clean and normalize data
     cleaned_df = clean_dataframe(threads_df, text_columns=["title", "selftext"])
     normalized_df = normalize_timestamp(cleaned_df, time_column="created_utc")
+    normalized_df.to_csv("normalized_df.csv")
+    print("Normalized DataFrame:", normalized_df.head())
 
-    # Step 5: Perform sentiment analysis
-    sentiment_df = add_vader_sentiment(normalized_df, text_columns=["title", "selftext"])
+    #  #### WORKS TO HERE ####
 
-    # Step 6: Save to database
-    save_dataframe_to_db(sentiment_df, table_name=CONFIG["db_table"], engine="your_db_engine_here")
 
-    # Step 7: Visualize results
-    plot_sentiment_distribution(sentiment_df)
-    plot_sentiment_over_time(sentiment_df, time_column="created_utc")
+    # # Step 5: Perform sentiment analysis
+    # sentiment_df = add_vader_sentiment(normalized_df, text_columns=["title", "selftext"])
+    #
+    # # Step 6: Visualize results
+    # plot_sentiment_distribution(sentiment_df)
+    # plot_sentiment_over_time(sentiment_df, time_column="created_utc")
 
 if __name__ == "__main__":
     main()

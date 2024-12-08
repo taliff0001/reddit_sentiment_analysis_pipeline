@@ -1,3 +1,5 @@
+from sqlalchemy.dialects import postgresql
+
 from data_collection.fetch_reddit_data import authenticate_reddit, fetch_threads
 from data_transformation.clean_data import clean_dataframe
 from data_transformation.normalize_fields import normalize_timestamp
@@ -21,7 +23,7 @@ def main():
     # Fetch threads from specified subreddits
     threads = []
     for subreddit in config["subreddits"]:
-        threads += fetch_threads(reddit, subreddit, keywords=config["keywords"], limit=50)
+        threads += fetch_threads(reddit, subreddit, keywords=config["keywords"], limit=10)
 
     # Convert collected threads to a DataFrame
     threads_df = pd.DataFrame(threads)
@@ -36,7 +38,7 @@ def main():
     sentiment_df = add_vader_sentiment(normalized_df, text_columns=["title", "selftext"])
 
     # Save results to the database
-    save_dataframe_to_db(sentiment_df, table_name=config["db_table"], engine="your_db_engine_here")
+    save_dataframe_to_db(sentiment_df, table_name=config["db_table"], engine=postgresql)
 
     # Visualize sentiment distribution
     plot_sentiment_distribution(sentiment_df)

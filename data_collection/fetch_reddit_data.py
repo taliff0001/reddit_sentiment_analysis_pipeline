@@ -10,61 +10,44 @@ import praw
 from praw.models import Submission, Comment
 from typing import List, Optional
 
-def authenticate_reddit() -> praw.Reddit:
+import praw
+import json
+
+def authenticate_reddit():
     """
     Authenticates and returns a Reddit instance using PRAW.
 
     Returns:
         praw.Reddit: Authenticated Reddit instance.
     """
-    # Retrieve Reddit API credentials from environment variables
-    client_id = os.getenv('REDDIT_CLIENT_ID')
-    client_secret = os.getenv('REDDIT_CLIENT_SECRET')
-    user_agent = os.getenv('REDDIT_USER_AGENT')
+    with open("config/reddit_credentials.json", "r") as f:
+        credentials = json.load(f)
 
-    # Ensure all necessary credentials are available
-    if not all([client_id, client_secret, user_agent]):
-        raise ValueError("Missing Reddit API credentials.")
-
-    # Create and return the Reddit instance
     return praw.Reddit(
-        client_id=client_id,
-        client_secret=client_secret,
-        user_agent=user_agent
+        client_id=credentials["client_id"],
+        client_secret=credentials["client_secret"],
+        user_agent=credentials["user_agent"],
+        username=credentials["username"],
+        password=credentials["password"]
     )
 
-def fetch_threads(
-    reddit: praw.Reddit,
-    subreddit: str,
-    keywords: Optional[List[str]] = None,
-    limit: int = 100
-) -> List[Submission]:
-    """
-    Fetches threads from a specified subreddit, optionally filtered by keywords.
-
-    Args:
-        reddit (praw.Reddit): Authenticated Reddit instance.
-        subreddit (str): Name of the subreddit to fetch threads from.
-        keywords (Optional[List[str]]): List of keywords to filter threads.
-        limit (int): Maximum number of threads to fetch.
-
-    Returns:
-        List[Submission]: List of fetched Reddit submissions.
-    """
-    # Access the specified subreddit
+def fetch_threads(reddit, subreddit, keywords=None, limit=100):
     sub = reddit.subreddit(subreddit)
-
-    # Initialize an empty list to store fetched threads
     threads = []
 
-    # Iterate over the subreddit's new submissions up to the specified limit
     for submission in sub.new(limit=limit):
-        # If keywords are specified, filter threads that contain any of the keywords
-        if keywords:
-            if any(keyword.lower() in submission.title.lower() for keyword in keywords):
-                threads.append(submission)
-        else:
-            threads.append(submission)
+        if keywords and not any(keyword.lower() in submission.title.lower() for keyword in keywords):
+            continue
+
+        threads.append({
+            "id": submission.id,
+            "title": submission.title or "No Title",
+            "selftext": submission.selftext or "No Content",
+            "author": str(submission.author),
+            "subreddit": submission.subreddit.display_name,
+            "score": submission.score,
+            "created_utc": submission.created_utc
+        })
 
     return threads
 
