@@ -1,0 +1,36 @@
+
+Options for method in pipeline_config.json:
+
+	1.	vader:
+	•	Description: Refers to using the VADER (Valence Aware Dictionary and sEntiment Reasoner) algorithm for sentiment analysis.
+	•	Strengths:
+	•	Lightweight and fast.
+	•	Great for analyzing short text like social media comments or news headlines.
+	•	Doesn’t require large computational resources.
+	•	Use Case: Suitable for scenarios where speed is essential, and you don’t need highly nuanced sentiment detection.
+	•	Limitations:
+	•	Rule-based, so it lacks the deep understanding of context that more advanced models can provide.
+	2.	transformers:
+	•	Description: Refers to using a Transformer-based deep learning model for sentiment analysis, typically implemented via libraries like Hugging Face’s transformers.
+	•	Example model: distilbert-base-uncased (a lightweight version of BERT).
+	•	Strengths:
+	•	Offers more nuanced understanding of context and language.
+	•	Can handle complex text with greater accuracy compared to VADER.
+	•	Use Case: Best for scenarios where accuracy is more critical than speed, such as analyzing lengthy and complex sentences or when high-quality sentiment detection is required.
+	•	Limitations:
+	•	Requires more computational resources.
+	•	Slower than VADER, especially with larger datasets.
+
+
+Choosing the Right Option
+
+	•	Use vader when:
+	•	You’re working with short, informal text like tweets or Reddit comments.
+	•	Speed is critical, and computational resources are limited.
+
+	•	Use transformers when:
+	•	You have access to sufficient computational resources.
+	•	The input text is longer or more complex (e.g., news articles or detailed Reddit threads).
+	•	You need higher accuracy and context-aware sentiment analysis.
+
+If you choose transformers, you’ll also need to specify the transformer_model field, which indicates the pre-trained model to use (e.g., distilbert-base-uncased, bert-base-uncased). This is part of Hugging Face’s Transformer ecosystem.

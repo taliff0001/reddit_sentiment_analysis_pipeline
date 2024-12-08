@@ -1,0 +1,9 @@
+praw
+nltk
+transformers
+pandas
+sqlalchemy
+matplotlib
+seaborn
+psycopg2-binary
+PyYAML

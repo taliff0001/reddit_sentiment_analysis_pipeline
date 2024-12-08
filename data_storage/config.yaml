@@ -1,0 +1,9 @@
+# data_storage/config.yaml
+
+dialect: postgresql
+driver: psycopg2
+username: your_username
+password: your_password
+host: localhost
+port: 5432
+database: your_database
