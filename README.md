@@ -5,6 +5,8 @@ This project is still very much a work in progress, as is the paper. The core fu
 <p><a href="https://tommyaliff.com/t_aliff_modular_analysis_reddit_dec_2024.docx"><b>Read the paper</b></a>
 </br><sub>(See <a href=references.md>references.md</a> for sources.)</sub></p>
 
+---
+
 ## Overview
 
 This project is a modular, scalable pipeline designed to analyze sentiment in Reddit threads and comments. The pipeline integrates data collection, transformation, sentiment analysis, storage, and visualization.
