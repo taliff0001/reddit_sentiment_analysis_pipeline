@@ -1,10 +1,15 @@
-# Reddit Sentiment Analysis Pipeline
+<h2>Reddit Sentiment Analysis Pipeline</h2>
+<blockquote>
+This project is still very much a work in progress, as is the paper. The core functionality is in place, accomplishing the goal I had set out for in my data engineering course at Radford, but several features are still in the testing/debugging phase. This includes the filtering of search results from multiple subreddits and keywords in the same section, the Postgres database connection for storing execution results, and the use of transformers in place of VADER analysis (this is a setting that can be configured by altering the appropriate values in <code>config/pipeline_config.json</code>)
+</blockquote>
+<p><a href="https://tommyaliff.com/t_aliff_modular_analysis_reddit_dec_2024.docx"><b>Read the paper</b></a>
+</br><sub>(See <a href=references.md>references.md</a> for sources.)</sub></p>
 
 ## Overview
 
 This project is a modular, scalable pipeline designed to analyze sentiment in Reddit threads and comments. The pipeline integrates data collection, transformation, sentiment analysis, storage, and visualization.
 
-Key features include:
+**Key features:**
 
 - Real-time or batch data collection from Reddit using PRAW.
 - Configurable cleaning and normalization of Reddit posts and comments.
