@@ -6,12 +6,12 @@ to fetch threads and comments based on specified criteria.
 """
 
 import os
-import praw
 from praw.models import Submission, Comment
 from typing import List, Optional
-
+import config as cfg
 import praw
 import json
+
 
 def authenticate_reddit():
     """
@@ -30,6 +30,7 @@ def authenticate_reddit():
         username=credentials["username"],
         password=credentials["password"]
     )
+
 
 def fetch_threads(reddit, subreddit, keywords=None, limit=100):
     sub = reddit.subreddit(subreddit)
@@ -51,10 +52,11 @@ def fetch_threads(reddit, subreddit, keywords=None, limit=100):
 
     return threads
 
+
 def fetch_comments(
-    reddit: praw.Reddit,
-    submission_id: str,
-    limit: int = 100
+        reddit: praw.Reddit,
+        submission_id: str,
+        limit: int = 100
 ) -> List[Comment]:
     """
     Fetches comments from a specified Reddit submission.
