@@ -15,7 +15,7 @@ def normalize_timestamp(df: pd.DataFrame, time_column: str, format: str = '%Y-%m
     Returns:
         pd.DataFrame: DataFrame with normalized timestamp column.
     """
-    df[time_column] = pd.to_datetime(df[time_column], errors='coerce')
+    df[time_column] = pd.to_datetime(df[time_column], errors='coerce', unit='s')
     df[time_column] = df[time_column].dt.strftime(format)
     return df
 

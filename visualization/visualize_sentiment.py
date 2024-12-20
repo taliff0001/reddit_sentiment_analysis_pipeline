@@ -1,53 +1,132 @@
-import pandas as pd  # Import pandas for data manipulation
-import matplotlib.pyplot as plt  # Import matplotlib for plotting
-import seaborn as sns  # Import seaborn for enhanced visualizations
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+
+def extract_compound_scores(sentiment_data):
+    """
+    Extracts compound scores from sentiment dictionaries.
+
+    Parameters:
+    sentiment_data (pd.DataFrame): DataFrame containing sentiment dictionaries
+
+    Returns:
+    pd.Series: Series of compound scores
+    """
+    return sentiment_data['title_sentiment'].apply(lambda x: x['compound'])
+
+
+def categorize_sentiment(compound_score):
+    """
+    Converts compound score to categorical sentiment.
+
+    Parameters:
+    compound_score (float): The compound sentiment score
+
+    Returns:
+    str: Sentiment category
+    """
+    if compound_score >= 0.05:
+        return 'Positive'
+    elif compound_score <= -0.05:
+        return 'Negative'
+    else:
+        return 'Neutral'
+
 
 def plot_sentiment_distribution(sentiment_data):
     """
-    Plots the distribution of sentiment categories.
+    Creates multiple visualizations of sentiment distribution.
 
     Parameters:
-    sentiment_data (pd.DataFrame): DataFrame containing a 'sentiment' column with sentiment labels.
+    sentiment_data (pd.DataFrame): DataFrame containing sentiment data
 
     Returns:
     None
     """
-    # Set the aesthetic style of the plots
-    sns.set(style="whitegrid")
+    # Extract compound scores
+    compound_scores = extract_compound_scores(sentiment_data)
 
-    # Create a count plot of sentiment categories
-    plt.figure(figsize=(10, 6))  # Set the figure size
-    sns.countplot(x='sentiment', data=sentiment_data, palette='viridis')  # Create count plot
-    plt.title('Sentiment Distribution')  # Set plot title
-    plt.xlabel('Sentiment')  # Set x-axis label
-    plt.ylabel('Count')  # Set y-axis label
-    plt.show()  # Display the plot
+    # Create categorical sentiments
+    categorical_sentiments = compound_scores.apply(categorize_sentiment)
 
-def plot_sentiment_over_time(sentiment_data, time_column='timestamp'):
+    # Create a figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Plot 1: Histogram/Density plot of compound scores
+    sns.histplot(data=compound_scores, bins=30, kde=True, ax=ax1)
+    ax1.set_title('Distribution of Sentiment Compound Scores')
+    ax1.set_xlabel('Compound Score')
+    ax1.set_ylabel('Count')
+
+    # Add vertical lines for sentiment thresholds
+    ax1.axvline(x=-0.05, color='r', linestyle='--', alpha=0.5)
+    ax1.axvline(x=0.05, color='r', linestyle='--', alpha=0.5)
+
+    # Plot 2: Bar plot of categorical sentiments
+    sns.countplot(x=categorical_sentiments, ax=ax2, palette='viridis')
+    ax2.set_title('Distribution of Sentiment Categories')
+    ax2.set_xlabel('Sentiment Category')
+    ax2.set_ylabel('Count')
+
+    # Add count labels on top of bars
+    for i in ax2.containers:
+        ax2.bar_label(i)
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_sentiment_over_time(sentiment_data, time_column='created_utc'):
     """
     Plots sentiment trends over time.
 
     Parameters:
-    sentiment_data (pd.DataFrame): DataFrame containing 'sentiment' and time columns.
-    time_column (str): Name of the column containing time data.
+    sentiment_data (pd.DataFrame): DataFrame containing sentiment and time data
+    time_column (str): Name of the column containing time data
 
     Returns:
     None
     """
-    # Ensure the time column is in datetime format
-    sentiment_data[time_column] = pd.to_datetime(sentiment_data[time_column])
+    # Convert timestamps and extract compound scores
+    sentiment_data = sentiment_data.copy()
+    sentiment_data[time_column] = pd.to_datetime(sentiment_data[time_column], unit='s')
+    sentiment_data['compound_score'] = extract_compound_scores(sentiment_data)
 
-    # Set the time column as the index
-    sentiment_data.set_index(time_column, inplace=True)
+    # Calculate daily average sentiment
+    daily_sentiment = sentiment_data.set_index(time_column).resample('D')['compound_score'].agg(['mean', 'count'])
 
-    # Resample data by day and count sentiment occurrences
-    sentiment_counts = sentiment_data.resample('D').sentiment.value_counts().unstack().fillna(0)
+    # Create figure with two y-axes
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    ax2 = ax1.twinx()
 
-    # Plot the sentiment trends over time
-    plt.figure(figsize=(12, 8))  # Set the figure size
-    sentiment_counts.plot(ax=plt.gca())  # Plot the data on the current axes
-    plt.title('Sentiment Over Time')  # Set plot title
-    plt.xlabel('Date')  # Set x-axis label
-    plt.ylabel('Count')  # Set y-axis label
-    plt.legend(title='Sentiment')  # Add legend with title
-    plt.show()  # Display the plot
+    # Plot average sentiment
+    line1 = ax1.plot(daily_sentiment.index, daily_sentiment['mean'],
+                     color='blue', label='Average Sentiment')
+    ax1.set_ylabel('Average Sentiment Score', color='blue')
+    ax1.tick_params(axis='y', labelcolor='blue')
+
+    # Plot post count
+    line2 = ax2.plot(daily_sentiment.index, daily_sentiment['count'],
+                     color='red', label='Post Count')
+    ax2.set_ylabel('Number of Posts', color='red')
+    ax2.tick_params(axis='y', labelcolor='red')
+
+    # Add combined legend
+    lines = line1 + line2
+    labels = [l.get_label() for l in lines]
+    ax1.legend(lines, labels, loc='upper left')
+
+    plt.title('Sentiment Trends Over Time')
+    plt.show()
+
+
+# Example usage:
+if __name__ == "__main__":
+    # Load your data
+    sentiment_df = pd.read_csv('sentiment_df.csv')
+
+    # Create visualizations
+    plot_sentiment_distribution(sentiment_df)
+    plot_sentiment_over_time(sentiment_df)
