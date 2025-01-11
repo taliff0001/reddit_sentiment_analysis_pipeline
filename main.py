@@ -45,16 +45,17 @@ def main():
     normalized_df = normalize_timestamp(cleaned_df, time_column="created_utc")
     normalized_df.to_csv("normalized_df.csv")
     print("Normalized DataFrame:", normalized_df.head())
-
+    normalized_df.to_csv("scratch/normalized_df.csv")
     #  #### WORKS TO HERE ####
 
 
-    # # Step 5: Perform sentiment analysis
-    # sentiment_df = add_vader_sentiment(normalized_df, text_columns=["title", "selftext"])
-    #
-    # # Step 6: Visualize results
-    # plot_sentiment_distribution(sentiment_df)
-    # plot_sentiment_over_time(sentiment_df, time_column="created_utc")
+    # Step 5: Perform sentiment analysis
+    sentiment_df = add_vader_sentiment(normalized_df, text_columns=["title"])
+    sentiment_df.to_csv("scratch/sentiment_df.csv")
+
+    # Step 6: Visualize results
+    plot_sentiment_distribution(sentiment_df)
+    plot_sentiment_over_time(sentiment_df, time_column="created_utc")
 
 if __name__ == "__main__":
     main()

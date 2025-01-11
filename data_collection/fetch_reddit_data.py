@@ -5,10 +5,8 @@ This module handles authentication with the Reddit API and provides functions
 to fetch threads and comments based on specified criteria.
 """
 
-import os
 from praw.models import Submission, Comment
 from typing import List, Optional
-import config as cfg
 import praw
 import json
 
